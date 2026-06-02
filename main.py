@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plot
 from scipy.stats import norm
 
+##Black Scholes formula calculator
 def black_scholes(StockP, StrikeP, RiskR, Svolat, Time, Option_type="Call"):
     """"
     StockP is the stock price
@@ -26,12 +27,29 @@ def black_scholes(StockP, StrikeP, RiskR, Svolat, Time, Option_type="Call"):
 
 print(black_scholes(StockP=100, StrikeP=100, Time=1, RiskR=0.05, Svolat=0.2, Option_type="Call"))
 
-stock_Prices = np.linspace(50, 100, 150, 200)
-prices = black_scholes(StockP=stock_Prices, StrikeP=100, Time=1, RiskR=0.05, Svolat=0.2, Option_type="Call")
+##variables to easily change the values in the black_scholes formula
+StockPrice = 100 
+T = 1
+Rate = 0.05
+K = 100
+Sigma = 0.2
 
-plot.plot(stock_Prices, prices)
+
+
+stock_Prices = np.linspace(50, 150, 200)
+CallPrices = black_scholes(StockP=stock_Prices, StrikeP=K, Time=T, RiskR=Rate, Svolat=Sigma, Option_type="Call")
+PutPrices = black_scholes(StockP=stock_Prices, StrikeP=K, Time=T, RiskR=Rate, Svolat=Sigma, Option_type="Put")
+
+plot.plot(stock_Prices, CallPrices, label="Call")
+plot.plot(stock_Prices, PutPrices, label="Put")
+
 plot.xlabel("Stock price (S)")
 plot.ylabel("Call option price")
+plot.axvline(x=K, color="gray", linestyle="--", label="Strike (K=100)")
 plot.title("Black-Scholes call price vs stock price")
+plot.legend()
 plot.grid(True)
-plot.savefig("option_plot.png")
+plot.savefig("StockPriceVaries.png")
+
+
+
