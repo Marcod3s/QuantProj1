@@ -34,12 +34,13 @@ Rate = 0.05
 K = 100
 Sigma = 0.2
 
-
+##When stock price varies
 
 stock_Prices = np.linspace(50, 150, 200)
 CallPrices = black_scholes(StockP=stock_Prices, StrikeP=K, Time=T, RiskR=Rate, Svolat=Sigma, Option_type="Call")
 PutPrices = black_scholes(StockP=stock_Prices, StrikeP=K, Time=T, RiskR=Rate, Svolat=Sigma, Option_type="Put")
 
+plot.figure()
 plot.plot(stock_Prices, CallPrices, label="Call")
 plot.plot(stock_Prices, PutPrices, label="Put")
 
@@ -51,5 +52,38 @@ plot.legend()
 plot.grid(True)
 plot.savefig("StockPriceVaries.png")
 
+##when volatility varies
+
+sigma_values = np.linspace(.01, .6, 200)
+call_sigma_prices = black_scholes(StockP=StockPrice, StrikeP=K, Time=T, RiskR=Rate, Svolat=sigma_values, Option_type="Call")
+put_sigma_prices = black_scholes(StockP=StockPrice, StrikeP=K, Time=T, RiskR=Rate, Svolat=sigma_values, Option_type="Put")
+
+plot.figure()
+plot.plot(sigma_values, call_sigma_prices, label="Call")
+plot.plot(sigma_values, put_sigma_prices, label="Put")
+plot.xlabel("Sigma Volatility (S)")
+plot.ylabel("Option price")
+plot.title("Option price vs volatility")
+plot.legend()
+plot.grid(True)
+plot.savefig("OptionVolatility.png")
+
+##When time varies
+
+time_values = np.linspace(0.01, 2, 200)
+
+call_time_prices = black_scholes(StockP=StockPrice, StrikeP=K, Time=time_values, RiskR=Rate, Svolat=Sigma, Option_type="Call")
+put_time_prices = black_scholes(StockP=StockPrice, StrikeP=K, Time=time_values, RiskR=Rate, Svolat=Sigma, Option_type="Put")
+
+plot.figure()
+plot.plot(time_values, call_time_prices, label="Call")
+plot.plot(time_values, put_time_prices, label="Put")
+
+plot.xlabel("Time")
+plot.ylabel("Option price")
+plot.title("Option price vs expiration date")
+plot.legend()
+plot.grid(True)
+plot.savefig("TimeVaries.png")
 
 
