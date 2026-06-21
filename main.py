@@ -25,7 +25,7 @@ def black_scholes(StockP, StrikeP, RiskR, Svolat, Time, Option_type="Call"):
 
     return price
 
-print(black_scholes(StockP=100, StrikeP=100, Time=1, RiskR=0.05, Svolat=0.2, Option_type="Call"))
+## Check print(black_scholes(StockP=100, StrikeP=100, Time=1, RiskR=0.05, Svolat=0.2, Option_type="Call"))
 
 ##variables to easily change the values in the black_scholes formula
 StockPrice = 100 
@@ -87,3 +87,62 @@ plot.grid(True)
 plot.savefig("TimeVaries.png")
 
 
+##greeks - delta, gamma, theta vega
+##delta - sensitivity to stock price (what is the option price now) 
+
+def delta(StockP, StrikeP, RiskR, Svolat, Time, Option_type="Call"):
+    d1 = (np.log(StockP/StrikeP) + (RiskR + .5 * Svolat**2)) / (Svolat * np.sqrt(Time))
+    if Option_type == 'Call':
+        return norm.cdf(d1)
+    elif Option_type == "Put":
+        return norm.cdf(d1) - 1
+    else:
+        raise ValueError("Option_type must be either 'Call' or 'Put' ")
+
+Delta_values = np.linspace(50,150,200)
+
+delta_call_values = delta(Delta_values, StrikeP = 100, RiskR = .05, Svolat = .2, Time = 1, Option_type = "Call")
+delta_put_values = delta(Delta_values, StrikeP = 100, RiskR = .05, Svolat = .2, Time = 1, Option_type = "Put")
+
+plot.figure()
+plot.plot(Delta_values, delta_call_values, label="Call delta")
+plot.plot(Delta_values, delta_put_values, label="Put delta")
+plot.axvline(x=100, color="gray", linestyle="--", label="Strike (K=100)")
+plot.axhline(y=0, color="black", linewidth=0.5)
+plot.xlabel("Stock price (S)")
+plot.ylabel("Delta")
+plot.title("Delta vs stock price")
+plot.legend()
+plot.grid(True)
+plot.savefig("delta_plot.png")
+
+## Check  print(delta(StockP = 100, StrikeP = 100, RiskR = .05, Svolat = .2, Time = 1, Option_type = "Call" )) 
+
+
+##gamma - Sensitivity to delta (how fast is delta changing)
+
+def gamma(StockP, StrikeP, Time, RiskR, Svolat):
+    d1 = (np.log(StockP/StrikeP) + (RiskR + .5 * Svolat**2)) / (Svolat * np.sqrt(Time))
+    return norm.pdf(d1) / (StockP * Svolat * np.sqrt(Time))
+
+## check print(gamma(StockP = 100, StrikeP = 100, Time = 1, RiskR = 0.05, Svolat = .2))
+
+Gamma_pre_values = np.linspace(50,150,200)
+Gamma_values = gamma(Gamma_pre_values, StrikeP = 100, RiskR = .05, Svolat = .2, Time = 1)
+
+plot.figure()
+plot.plot(Gamma_pre_values, Gamma_values, label="Gamma")
+plot.axvline(x=100, color="gray", linestyle="--", label="Strike (K=100)")
+plot.xlabel("Stock price (S)")
+plot.ylabel("Gamma")
+plot.title("Gamma vs stock price")
+plot.legend()
+plot.grid(True)
+plot.savefig("gamma_plot.png")
+
+##theta - how much does the value of the option price change over time
+
+def theta(StockP, StrikeP, RiskR, Svolat, Time, Option_type="Call"):
+    
+
+##vega - if volatility changes, how much does the price change 
