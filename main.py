@@ -99,14 +99,14 @@ def delta(StockP, StrikeP, RiskR, Svolat, Time, Option_type="Call"):
     else:
         raise ValueError("Option_type must be either 'Call' or 'Put' ")
 
-Delta_values = np.linspace(50,150,200)
+S_values = np.linspace(50,150,200)
 
-delta_call_values = delta(Delta_values, StrikeP = 100, RiskR = .05, Svolat = .2, Time = 1, Option_type = "Call")
-delta_put_values = delta(Delta_values, StrikeP = 100, RiskR = .05, Svolat = .2, Time = 1, Option_type = "Put")
+delta_call_values = delta(S_values, StrikeP = 100, RiskR = .05, Svolat = .2, Time = 1, Option_type = "Call")
+delta_put_values = delta(S_values, StrikeP = 100, RiskR = .05, Svolat = .2, Time = 1, Option_type = "Put")
 
 plot.figure()
-plot.plot(Delta_values, delta_call_values, label="Call delta")
-plot.plot(Delta_values, delta_put_values, label="Put delta")
+plot.plot(S_values, delta_call_values, label="Call delta")
+plot.plot(S_values, delta_put_values, label="Put delta")
 plot.axvline(x=100, color="gray", linestyle="--", label="Strike (K=100)")
 plot.axhline(y=0, color="black", linewidth=0.5)
 plot.xlabel("Stock price (S)")
@@ -127,11 +127,11 @@ def gamma(StockP, StrikeP, Time, RiskR, Svolat):
 
 ## check print(gamma(StockP = 100, StrikeP = 100, Time = 1, RiskR = 0.05, Svolat = .2))
 
-Gamma_pre_values = np.linspace(50,150,200)
-Gamma_values = gamma(Gamma_pre_values, StrikeP = 100, RiskR = .05, Svolat = .2, Time = 1)
+S_values = np.linspace(50,150,200)
+Gamma_values = gamma(S_values, StrikeP = 100, RiskR = .05, Svolat = .2, Time = 1)
 
 plot.figure()
-plot.plot(Gamma_pre_values, Gamma_values, label="Gamma")
+plot.plot(S_values, Gamma_values, label="Gamma")
 plot.axvline(x=100, color="gray", linestyle="--", label="Strike (K=100)")
 plot.xlabel("Stock price (S)")
 plot.ylabel("Gamma")
@@ -143,6 +143,60 @@ plot.savefig("gamma_plot.png")
 ##theta - how much does the value of the option price change over time
 
 def theta(StockP, StrikeP, RiskR, Svolat, Time, Option_type="Call"):
+
+    d1 = (np.log(StockP/StrikeP) + (RiskR + 0.5 * Svolat**2)*Time )/ Svolat * np.sqrt(Time)
+    d2 = d1 - Svolat * np.sqrt(Time)
+
+    if Option_type == "Call":
+        term1 = -(StockP * norm.pdf(d1) * Svolat) / (2 * np.sqrt(Time))
+        term2 = -RiskR * StrikeP * np.exp(-RiskR * Time) * norm.cdf(d2)
+        return (term1 + term2) /365
     
+    elif Option_type == "Put":
+        term1 = -(StockP * norm.pdf(d1) * Svolat) / (2 * np.sqrt(Time))
+        term2 = RiskR * StrikeP * np.exp(-RiskR * Time) * norm.cdf(-d2)
+        return (term1 + term2) / 365
+    else:
+        raise ValueError("Option Type must be either 'Call' or 'Put'")
+
+## Theta Check print(theta(StockP = 100, StrikeP = 100, RiskR = 0.05, Svolat = .2, Time = 1, Option_type = "Call" ))
+
+S_values = np.linspace(50, 150, 200)
+
+Theta_call_values = theta(S_values, StrikeP=100, RiskR=0.05, Svolat=0.2, Time = 1, Option_type="Call")
+Theta_put_values  = theta(S_values, StrikeP=100, RiskR=0.05, Svolat=0.2, Time = 1, Option_type="Put")
+
+plot.figure()
+plot.plot(S_values, Theta_call_values, label="Call theta")
+plot.plot(S_values, Theta_put_values, label="Put theta")
+plot.axvline(x=100, color="gray", linestyle="--", label="Strike (K=100)")
+plot.axhline(y=0, color="black", linewidth=0.5)
+plot.xlabel("Stock price (S)")
+plot.ylabel("Theta (value lost per day)")
+plot.title("Theta vs stock price")
+plot.legend()
+plot.grid(True)
+plot.savefig("theta_plot.png")
+
+
 
 ##vega - if volatility changes, how much does the price change 
+
+def vega(StockP, StrikeP, RiskR, Svolat, Time):
+    d1 = (np.log(StockP/StrikeP) + (RiskR + 0.5 * Svolat**2)*Time )/ Svolat * np.sqrt(Time)
+    return StockP * norm.pdf(d1) * np.sqrt(Time) / 100
+
+##Vega check print(vega(StockP = 100, StrikeP = 100, RiskR = 0.05, Svolat = .2, Time = 1))
+
+Vega_values = vega(S_values, StrikeP = 100, RiskR = 0.05, Svolat = .2, Time = 1)
+
+
+plot.figure()
+plot.plot(S_values, Vega_values, label="Vega")
+plot.axvline(x=100, color="gray", linestyle="--", label="Strike (K=100)")
+plot.xlabel("Stock price (S)")
+plot.ylabel("Vega")
+plot.title("Vega vs stock price")
+plot.legend()
+plot.grid(True)
+plot.savefig("vega_plot.png")
